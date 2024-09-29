@@ -43,10 +43,10 @@ export async function handleSubmit(formData: FormData) {
       const responseData = await uploadResponse.json();
       console.log("Upload response data:", responseData);
 
-      if (!responseData.fileName) {
-        throw new Error("No fileName returned from upload");
+      if (!responseData.url) {
+        throw new Error("No URL returned from upload");
       }
-      imageUrl = `/uploads/${responseData.fileName}`;
+      imageUrl = responseData.url;
     }
 
     const articleId = await submitArticle(content, imageUrl);
