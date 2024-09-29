@@ -6,26 +6,16 @@ export async function GET(
   request: Request,
   { params }: { params: { id: string } }
 ) {
-  const adminToken = cookies().get("admin_token");
-  const isAdmin = adminToken && adminToken.value === "true";
+  // 假設這是從數據庫獲取文章的函數
+  const article = await getArticleFromDatabase(params.id);
 
-  try {
-    const article = await getArticleById(params.id);
-    if (!article) {
-      return NextResponse.json({ error: "Article not found" }, { status: 404 });
-    }
-    if (!isAdmin && article.status !== "approved") {
-      return NextResponse.json(
-        { error: "Article not available" },
-        { status: 404 }
-      );
-    }
-    return NextResponse.json({ article });
-  } catch (error) {
-    console.error("Error fetching article:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch article" },
-      { status: 500 }
+  // 處理圖片URL
+  if (article.image) {
+    article.image = article.image.replace(
+      /^https:\/\/cms\.owen0924\.co\/_next\/image\?url=(.+)&w=\d+&q=\d+$/,
+      decodeURIComponent("$1")
     );
   }
+
+  return NextResponse.json(article);
 }
