@@ -69,7 +69,7 @@ export default function ImageModal({ src, alt }: ImageModalProps) {
                 top: 8,
                 color: "white",
                 bgcolor: "rgba(0, 0, 0, 0.5)",
-                zIndex: 1,
+                zIndex: 1, // 確保按鈕在圖片上層
                 "&:hover": {
                   bgcolor: "rgba(0, 0, 0, 0.7)",
                 },

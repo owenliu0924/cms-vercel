@@ -144,15 +144,7 @@ export async function hideArticle(id: string): Promise<void> {
 }
 
 export async function getAllArticlesForAdmin(): Promise<Article[]> {
-  const articles = await prisma.article.findMany({
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
-  return articles.map((article) => ({
-    ...article,
-    createdAt: article.createdAt.toISOString(),
-  })) as Article[];
+  return prisma.article.findMany() as Article[];
 }
 
 export async function deleteComment(commentId: string): Promise<void> {
