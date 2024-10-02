@@ -1,18 +1,4 @@
-async function getArticle(id: string) {
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/articles/${id}`,
-      { next: { revalidate: 60 } }
-    );
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    return await response.json();
-  } catch (error) {
-    console.error("Failed to fetch article:", error);
-    throw error;
-  }
-}
+import { getArticleById } from "@/lib/db";
 
 export default async function ArticlePage({
   params,
@@ -20,22 +6,21 @@ export default async function ArticlePage({
   params: { id: string };
 }) {
   try {
-    const article = await getArticle(params.id);
+    const article = await getArticleById(params.id);
+
+    if (!article) {
+      return <div>文章未找到</div>;
+    }
 
     return (
       <div>
         <h1>{article.title}</h1>
-        {article.image && (
-          <img
-            src={article.image}
-            alt={article.title}
-            style={{ maxWidth: "100%", height: "auto" }}
-          />
-        )}
         <p>{article.content}</p>
+        {article.imageUrl && <img src={article.imageUrl} alt="Article image" />}
       </div>
     );
   } catch (error) {
-    return <div>文章加載失敗：{(error as Error).message}</div>;
+    console.error("Error fetching article:", error);
+    return <div>加載文章時出錯</div>;
   }
 }

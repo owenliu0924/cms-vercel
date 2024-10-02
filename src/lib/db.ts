@@ -101,7 +101,12 @@ export async function getArticleById(id: string): Promise<Article | null> {
     const article = await prisma.article.findUnique({
       where: { id },
     });
-    return article as Article | null;
+
+    if (!article) {
+      return null;
+    }
+
+    return article as Article;
   } catch (error) {
     console.error("Error in getArticleById:", error);
     throw error;
