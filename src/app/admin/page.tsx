@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Article } from "@/types";
 import Image from "next/image";
 import {
@@ -29,26 +29,27 @@ export default function AdminPage() {
     null
   );
 
-  useEffect(() => {
-    async function fetchArticles() {
-      try {
-        const response = await fetch("/api/admin/articles");
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        setArticles(data.articles);
-      } catch (err) {
-        console.error("Client: Error fetching articles:", err);
-        setError(
-          `Failed to fetch articles. Error: ${
-            err instanceof Error ? err.message : String(err)
-          }`
-        );
+  const fetchArticles = useCallback(async () => {
+    try {
+      const response = await fetch("/api/admin/articles");
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
+      const data = await response.json();
+      setArticles(data.articles);
+    } catch (err) {
+      console.error("Client: Error fetching articles:", err);
+      setError(
+        `Failed to fetch articles. Error: ${
+          err instanceof Error ? err.message : String(err)
+        }`
+      );
     }
-    fetchArticles();
   }, []);
+
+  useEffect(() => {
+    fetchArticles();
+  }, [fetchArticles]);
 
   async function handleApprove(id: string) {
     try {
@@ -59,11 +60,7 @@ export default function AdminPage() {
         const errorData = await response.json();
         throw new Error(errorData.error || "Failed to approve article");
       }
-      setArticles(
-        articles.map((article) =>
-          article.id === id ? { ...article, status: "approved" } : article
-        )
-      );
+      await fetchArticles(); // 重新獲取文章列表
     } catch (err) {
       console.error("Error approving article:", err);
       setError(
@@ -82,13 +79,7 @@ export default function AdminPage() {
         body: JSON.stringify({ reason }),
       });
       if (!response.ok) throw new Error("Failed to reject article");
-      setArticles(
-        articles.map((article) =>
-          article.id === id
-            ? { ...article, status: "rejected", rejectionReason: reason }
-            : article
-        )
-      );
+      await fetchArticles(); // 重新獲取文章列表
     } catch {
       setError("Failed to reject article");
     }
@@ -105,9 +96,9 @@ export default function AdminPage() {
     setRejectingArticleId(null);
   };
 
-  const submitReject = () => {
+  const submitReject = async () => {
     if (rejectingArticleId) {
-      handleReject(rejectingArticleId, rejectReason);
+      await handleReject(rejectingArticleId, rejectReason);
       closeRejectDialog();
     }
   };
@@ -130,6 +121,12 @@ export default function AdminPage() {
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">管理員頁面</h1>
+      <button
+        onClick={fetchArticles}
+        className="mb-4 bg-blue-500 text-white px-4 py-2 rounded"
+      >
+        刷新文章列表
+      </button>
       {articles.length === 0 ? (
         <p>目前沒有文章。</p>
       ) : (
