@@ -28,9 +28,20 @@ export async function POST(request: Request) {
 
     let imageUrl = null;
     if (file) {
-      const filename = `${nanoid()}-${file.name}`;
-      const { url } = await put(filename, file, { access: "public" });
-      imageUrl = url;
+      try {
+        const filename = `${nanoid()}-${file.name}`;
+        const { url } = await put(filename, file, { access: "public" });
+        if (!url) {
+          throw new Error("No URL returned from upload");
+        }
+        imageUrl = url;
+      } catch (uploadError) {
+        console.error("Error uploading file:", uploadError);
+        return NextResponse.json(
+          { error: "Failed to upload image" },
+          { status: 500 }
+        );
+      }
     }
 
     const articleId = await submitArticle(content, imageUrl || "");
