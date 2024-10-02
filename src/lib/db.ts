@@ -1,7 +1,7 @@
 "use server";
 import { PrismaClient } from "@prisma/client";
 import { Article, Comment } from "@/types";
-// import path from "path";
+import path from "path";
 
 declare global {
   var prisma: PrismaClient | undefined;
@@ -18,7 +18,7 @@ if (process.env.NODE_ENV !== "production") {
 export async function getApprovedArticles(): Promise<Article[]> {
   return prisma.article.findMany({
     where: { status: "approved" },
-  });
+  }) as Article[];
 }
 
 export async function submitArticle(
@@ -28,7 +28,7 @@ export async function submitArticle(
   const article = await prisma.article.create({
     data: {
       content,
-      imageUrl: imageUrl || null, // 允許 imageUrl 為空字符串，此時存儲為 null
+      imageUrl: imageUrl || null,
       status: "pending",
     },
   });
@@ -38,7 +38,7 @@ export async function submitArticle(
 export async function getPendingArticles(): Promise<Article[]> {
   return prisma.article.findMany({
     where: { status: "pending" },
-  });
+  }) as Article[];
 }
 
 export async function approveArticle(id: string): Promise<void> {
@@ -59,7 +59,7 @@ export async function rejectArticle(id: string, reason: string): Promise<void> {
 }
 
 export async function getAllArticles(): Promise<Article[]> {
-  return prisma.article.findMany();
+  return prisma.article.findMany() as Article[];
 }
 
 export async function deleteArticle(id: string): Promise<void> {
@@ -83,7 +83,7 @@ export async function addArticle(
 ): Promise<Article> {
   return prisma.article.create({
     data: article,
-  });
+  }) as Article;
 }
 
 export async function testDatabaseConnection(): Promise<boolean> {
@@ -101,7 +101,7 @@ export async function getArticleById(id: string): Promise<Article | null> {
     const article = await prisma.article.findUnique({
       where: { id },
     });
-    return article;
+    return article as Article | null;
   } catch (error) {
     console.error("Error in getArticleById:", error);
     throw error;
@@ -139,7 +139,7 @@ export async function hideArticle(id: string): Promise<void> {
 }
 
 export async function getAllArticlesForAdmin(): Promise<Article[]> {
-  return prisma.article.findMany();
+  return prisma.article.findMany() as Article[];
 }
 
 export async function deleteComment(commentId: string): Promise<void> {
