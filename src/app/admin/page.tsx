@@ -28,6 +28,7 @@ export default function AdminPage() {
   const [rejectingArticleId, setRejectingArticleId] = useState<string | null>(
     null
   );
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     console.log("AdminPage mounted, fetching articles...");
@@ -35,6 +36,8 @@ export default function AdminPage() {
   }, []);
 
   async function fetchArticles() {
+    setIsLoading(true);
+    setError(null);
     try {
       console.log("Fetching articles...");
       const response = await fetch("/api/admin/articles");
@@ -42,8 +45,12 @@ export default function AdminPage() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      console.log("Fetched articles:", data.articles);
-      setArticles(data.articles);
+      console.log("Fetched articles:", data);
+      if (Array.isArray(data.articles)) {
+        setArticles(data.articles);
+      } else {
+        throw new Error("Received data is not an array");
+      }
     } catch (err) {
       console.error("Client: Error fetching articles:", err);
       setError(
@@ -51,6 +58,8 @@ export default function AdminPage() {
           err instanceof Error ? err.message : String(err)
         }`
       );
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -125,6 +134,10 @@ export default function AdminPage() {
         return "text-yellow-500";
     }
   };
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   if (error) {
     return <div className="text-red-500">{error}</div>;

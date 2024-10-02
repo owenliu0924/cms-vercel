@@ -7,7 +7,6 @@ export async function GET() {
     const articles = await getAllArticlesForAdmin();
     console.log(`API: Fetched ${articles.length} articles`);
 
-    // 新增：返回所有文章的 ID
     const articleIds = articles.map((article) => article.id);
     console.log("Article IDs:", articleIds);
 

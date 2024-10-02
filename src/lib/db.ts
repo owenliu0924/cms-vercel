@@ -164,15 +164,24 @@ export async function hideArticle(id: string): Promise<void> {
 }
 
 export async function getAllArticlesForAdmin(): Promise<Article[]> {
-  const articles = await prisma.article.findMany({
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
-  return articles.map((article) => ({
-    ...article,
-    createdAt: article.createdAt.toISOString(),
-  }));
+  try {
+    const articles = await prisma.article.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+    console.log(`Found ${articles.length} articles in the database`);
+    return articles.map((article) => ({
+      ...article,
+      createdAt: article.createdAt.toISOString(),
+      imageUrl: article.imageUrl || "",
+      status: article.status as "rejected" | "pending" | "approved",
+      rejectionReason: article.rejectionReason || undefined,
+    }));
+  } catch (error) {
+    console.error("Error in getAllArticlesForAdmin:", error);
+    throw error;
+  }
 }
 
 export async function deleteComment(commentId: string): Promise<void> {
