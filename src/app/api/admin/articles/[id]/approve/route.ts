@@ -6,10 +6,12 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   try {
+    console.log(`API: Approving article with id: ${params.id}`);
     await approveArticle(params.id);
+    console.log("API: Article approved successfully");
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Error approving article:", error);
+    console.error("API: Error approving article:", error);
     return NextResponse.json(
       { error: "Failed to approve article" },
       { status: 500 }

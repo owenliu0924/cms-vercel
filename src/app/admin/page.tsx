@@ -30,16 +30,19 @@ export default function AdminPage() {
   );
 
   useEffect(() => {
+    console.log("AdminPage mounted, fetching articles...");
     fetchArticles();
   }, []);
 
   async function fetchArticles() {
     try {
+      console.log("Fetching articles...");
       const response = await fetch("/api/admin/articles");
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
+      console.log("Fetched articles:", data.articles);
       setArticles(data.articles);
     } catch (err) {
       console.error("Client: Error fetching articles:", err);
@@ -53,6 +56,7 @@ export default function AdminPage() {
 
   async function handleApprove(id: string) {
     try {
+      console.log(`Approving article with id: ${id}`);
       const response = await fetch(`/api/admin/articles/${id}/approve`, {
         method: "POST",
       });
@@ -60,7 +64,10 @@ export default function AdminPage() {
         const errorData = await response.json();
         throw new Error(errorData.error || "Failed to approve article");
       }
-      await fetchArticles(); // 重新獲取所有文章
+      console.log(
+        "Article approved successfully, fetching updated articles..."
+      );
+      await fetchArticles();
     } catch (err) {
       console.error("Error approving article:", err);
       setError(
@@ -71,6 +78,7 @@ export default function AdminPage() {
 
   async function handleReject(id: string, reason: string) {
     try {
+      console.log(`Rejecting article with id: ${id}, reason: ${reason}`);
       const response = await fetch(`/api/admin/articles/${id}/reject`, {
         method: "POST",
         headers: {
@@ -79,7 +87,10 @@ export default function AdminPage() {
         body: JSON.stringify({ reason }),
       });
       if (!response.ok) throw new Error("Failed to reject article");
-      await fetchArticles(); // 重新獲取所有文章
+      console.log(
+        "Article rejected successfully, fetching updated articles..."
+      );
+      await fetchArticles();
     } catch (err) {
       console.error("Error rejecting article:", err);
       setError("Failed to reject article");
