@@ -113,18 +113,24 @@ export async function testDatabaseConnection(): Promise<boolean> {
 }
 
 export async function getArticleById(id: string): Promise<Article | null> {
-  const article = await prisma.article.findUnique({
-    where: { id },
-  });
+  try {
+    const article = await prisma.article.findUnique({
+      where: { id },
+    });
 
-  if (!article) {
-    return null;
+    if (!article) {
+      console.log(`Article with id ${id} not found`);
+      return null;
+    }
+
+    return {
+      ...article,
+      createdAt: article.createdAt.toISOString(),
+    };
+  } catch (error) {
+    console.error(`Error fetching article with id ${id}:`, error);
+    throw error;
   }
-
-  return {
-    ...article,
-    createdAt: article.createdAt.toISOString(),
-  };
 }
 
 export async function getCommentsByArticleId(

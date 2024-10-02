@@ -7,11 +7,15 @@ export default async function ArticlePage({
   params: { id: string };
 }) {
   try {
+    console.log(`Fetching article with id: ${params.id}`);
     const article = await getArticleById(params.id);
 
     if (!article) {
+      console.log(`Article with id ${params.id} not found`);
       return <div>文章未找到</div>;
     }
+
+    console.log(`Article found:`, article);
 
     return (
       <div>

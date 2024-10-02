@@ -6,7 +6,12 @@ export async function GET() {
     console.log("API: Fetching all articles for admin");
     const articles = await getAllArticlesForAdmin();
     console.log(`API: Fetched ${articles.length} articles`);
-    return NextResponse.json({ articles });
+
+    // 新增：返回所有文章的 ID
+    const articleIds = articles.map((article) => article.id);
+    console.log("Article IDs:", articleIds);
+
+    return NextResponse.json({ articles, articleIds });
   } catch (error) {
     console.error("API: Error fetching all articles for admin:", error);
     return NextResponse.json(
