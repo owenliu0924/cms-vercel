@@ -1,7 +1,7 @@
 export interface Article {
   id: string;
   content: string;
-  imageUrl: string | null; // 修改這裡
+  imageUrl: string | null;
   status: string;
   createdAt: Date;
   rejectionReason: string | null;
