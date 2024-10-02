@@ -16,9 +16,13 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 export async function getApprovedArticles(): Promise<Article[]> {
-  return prisma.article.findMany({
+  const articles = await prisma.article.findMany({
     where: { status: "approved" },
-  }) as Article[];
+  });
+  return articles.map((article) => ({
+    ...article,
+    createdAt: article.createdAt.toISOString(),
+  }));
 }
 
 export async function submitArticle(
@@ -36,9 +40,13 @@ export async function submitArticle(
 }
 
 export async function getPendingArticles(): Promise<Article[]> {
-  return prisma.article.findMany({
+  const articles = await prisma.article.findMany({
     where: { status: "pending" },
-  }) as Article[];
+  });
+  return articles.map((article) => ({
+    ...article,
+    createdAt: article.createdAt.toISOString(),
+  }));
 }
 
 export async function approveArticle(id: string): Promise<void> {
@@ -59,7 +67,11 @@ export async function rejectArticle(id: string, reason: string): Promise<void> {
 }
 
 export async function getAllArticles(): Promise<Article[]> {
-  return prisma.article.findMany() as Article[];
+  const articles = await prisma.article.findMany();
+  return articles.map((article) => ({
+    ...article,
+    createdAt: article.createdAt.toISOString(),
+  }));
 }
 
 export async function deleteArticle(id: string): Promise<void> {
@@ -81,9 +93,13 @@ export async function deleteArticle(id: string): Promise<void> {
 export async function addArticle(
   article: Omit<Article, "id" | "createdAt">
 ): Promise<Article> {
-  return prisma.article.create({
+  const newArticle = await prisma.article.create({
     data: article,
-  }) as Article;
+  });
+  return {
+    ...newArticle,
+    createdAt: newArticle.createdAt.toISOString(),
+  };
 }
 
 export async function testDatabaseConnection(): Promise<boolean> {
@@ -97,20 +113,18 @@ export async function testDatabaseConnection(): Promise<boolean> {
 }
 
 export async function getArticleById(id: string): Promise<Article | null> {
-  try {
-    const article = await prisma.article.findUnique({
-      where: { id },
-    });
+  const article = await prisma.article.findUnique({
+    where: { id },
+  });
 
-    if (!article) {
-      return null;
-    }
-
-    return article as Article;
-  } catch (error) {
-    console.error("Error in getArticleById:", error);
-    throw error;
+  if (!article) {
+    return null;
   }
+
+  return {
+    ...article,
+    createdAt: article.createdAt.toISOString(),
+  };
 }
 
 export async function getCommentsByArticleId(
