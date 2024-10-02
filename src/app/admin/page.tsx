@@ -73,10 +73,12 @@ export default function AdminPage() {
         const errorData = await response.json();
         throw new Error(errorData.error || "Failed to approve article");
       }
-      console.log(
-        "Article approved successfully, fetching updated articles..."
+      console.log("Article approved successfully, updating local state...");
+      setArticles((prevArticles) =>
+        prevArticles.map((article) =>
+          article.id === id ? { ...article, status: "approved" } : article
+        )
       );
-      await fetchArticles();
     } catch (err) {
       console.error("Error approving article:", err);
       setError(
@@ -96,10 +98,14 @@ export default function AdminPage() {
         body: JSON.stringify({ reason }),
       });
       if (!response.ok) throw new Error("Failed to reject article");
-      console.log(
-        "Article rejected successfully, fetching updated articles..."
+      console.log("Article rejected successfully, updating local state...");
+      setArticles((prevArticles) =>
+        prevArticles.map((article) =>
+          article.id === id
+            ? { ...article, status: "rejected", rejectionReason: reason }
+            : article
+        )
       );
-      await fetchArticles();
     } catch (err) {
       console.error("Error rejecting article:", err);
       setError("Failed to reject article");

@@ -50,20 +50,32 @@ export async function getPendingArticles(): Promise<Article[]> {
 }
 
 export async function approveArticle(id: string): Promise<void> {
-  await prisma.article.update({
-    where: { id },
-    data: { status: "approved" },
-  });
+  try {
+    await prisma.article.update({
+      where: { id },
+      data: { status: "approved" },
+    });
+    console.log(`Article ${id} approved successfully`);
+  } catch (error) {
+    console.error(`Error approving article ${id}:`, error);
+    throw error;
+  }
 }
 
 export async function rejectArticle(id: string, reason: string): Promise<void> {
-  await prisma.article.update({
-    where: { id },
-    data: {
-      status: "rejected",
-      rejectionReason: reason,
-    },
-  });
+  try {
+    await prisma.article.update({
+      where: { id },
+      data: {
+        status: "rejected",
+        rejectionReason: reason,
+      },
+    });
+    console.log(`Article ${id} rejected successfully`);
+  } catch (error) {
+    console.error(`Error rejecting article ${id}:`, error);
+    throw error;
+  }
 }
 
 export async function getAllArticles(): Promise<Article[]> {
