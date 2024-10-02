@@ -23,30 +23,18 @@ export async function handleSubmit(formData: FormData) {
     if (image) {
       console.log("Image file:", image.name, image.type, image.size);
 
-      const uploadFormData = new FormData();
-      uploadFormData.append("file", image);
-
-      const uploadUrl = process.env.NEXT_PUBLIC_API_URL + "/api/upload";
-      console.log("Uploading to:", uploadUrl);
-
-      const uploadResponse = await fetch(uploadUrl, {
-        method: "POST",
-        body: uploadFormData,
-      });
-
-      if (!uploadResponse.ok) {
-        const errorText = await uploadResponse.text();
-        console.error("Upload response:", errorText);
-        throw new Error(`Failed to upload image: ${errorText}`);
+      try {
+        const filename = `${nanoid()}-${image.name}`;
+        const { url } = await put(filename, image, { access: "public" });
+        if (!url) {
+          throw new Error("No URL returned from upload");
+        }
+        imageUrl = url;
+        console.log("Image uploaded successfully:", imageUrl);
+      } catch (uploadError) {
+        console.error("Error uploading image:", uploadError);
+        return { error: "Failed to upload image" };
       }
-
-      const responseData = await uploadResponse.json();
-      console.log("Upload response data:", responseData);
-
-      if (!responseData.url) {
-        throw new Error("No URL returned from upload");
-      }
-      imageUrl = responseData.url;
     }
 
     const articleId = await submitArticle(content, imageUrl);
@@ -60,14 +48,4 @@ export async function handleSubmit(formData: FormData) {
         (error instanceof Error ? error.message : String(error)),
     };
   }
-}
-
-export async function uploadImage(image: File) {
-  const filename = `${nanoid()}.${image.name.split(".").pop()}`;
-
-  const { url } = await put(filename, image, {
-    access: "public",
-  });
-
-  return url;
 }

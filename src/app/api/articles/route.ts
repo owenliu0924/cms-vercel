@@ -26,7 +26,7 @@ export async function POST(request: Request) {
     const content = formData.get("content") as string;
     const file = formData.get("file") as File | null;
 
-    let imageUrl = null;
+    let imageUrl = "";
     if (file) {
       try {
         const filename = `${nanoid()}-${file.name}`;
@@ -44,7 +44,7 @@ export async function POST(request: Request) {
       }
     }
 
-    const articleId = await submitArticle(content, imageUrl || "");
+    const articleId = await submitArticle(content, imageUrl);
 
     return NextResponse.json({ success: true, articleId });
   } catch (error) {
