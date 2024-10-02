@@ -40,7 +40,13 @@ export default function AdminPage() {
     setError(null);
     try {
       console.log("Fetching articles...");
-      const response = await fetch("/api/admin/articles");
+      const response = await fetch("/api/admin/articles", {
+        cache: "no-store",
+        headers: {
+          Pragma: "no-cache",
+          "Cache-Control": "no-cache, no-store, must-revalidate",
+        },
+      });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -73,12 +79,10 @@ export default function AdminPage() {
         const errorData = await response.json();
         throw new Error(errorData.error || "Failed to approve article");
       }
-      console.log("Article approved successfully, updating local state...");
-      setArticles((prevArticles) =>
-        prevArticles.map((article) =>
-          article.id === id ? { ...article, status: "approved" } : article
-        )
+      console.log(
+        "Article approved successfully, fetching updated articles..."
       );
+      await fetchArticles(); // 重新獲取所有文章
     } catch (err) {
       console.error("Error approving article:", err);
       setError(
@@ -98,14 +102,10 @@ export default function AdminPage() {
         body: JSON.stringify({ reason }),
       });
       if (!response.ok) throw new Error("Failed to reject article");
-      console.log("Article rejected successfully, updating local state...");
-      setArticles((prevArticles) =>
-        prevArticles.map((article) =>
-          article.id === id
-            ? { ...article, status: "rejected", rejectionReason: reason }
-            : article
-        )
+      console.log(
+        "Article rejected successfully, fetching updated articles..."
       );
+      await fetchArticles(); // 重新獲取所有文章
     } catch (err) {
       console.error("Error rejecting article:", err);
       setError("Failed to reject article");

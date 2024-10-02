@@ -10,7 +10,16 @@ export async function GET() {
     const articleIds = articles.map((article) => article.id);
     console.log("Article IDs:", articleIds);
 
-    return NextResponse.json({ articles, articleIds });
+    // 添加 no-cache 和 no-store 頭部
+    const response = NextResponse.json({ articles, articleIds });
+    response.headers.set(
+      "Cache-Control",
+      "no-cache, no-store, must-revalidate"
+    );
+    response.headers.set("Pragma", "no-cache");
+    response.headers.set("Expires", "0");
+
+    return response;
   } catch (error) {
     console.error("API: Error fetching all articles for admin:", error);
     return NextResponse.json(
