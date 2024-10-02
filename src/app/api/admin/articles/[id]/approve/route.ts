@@ -5,13 +5,13 @@ export async function POST(
   request: Request,
   { params }: { params: { id: string } }
 ) {
+  console.log(`Approve route handler called for article id: ${params.id}`); // 新增日誌
   try {
-    console.log(`API: Approving article with id: ${params.id}`);
     await approveArticle(params.id);
-    console.log("API: Article approved successfully");
+    console.log(`Article ${params.id} approved successfully`);
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("API: Error approving article:", error);
+    console.error("Error approving article:", error);
     return NextResponse.json(
       { error: "Failed to approve article" },
       { status: 500 }

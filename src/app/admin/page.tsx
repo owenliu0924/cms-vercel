@@ -70,19 +70,31 @@ export default function AdminPage() {
   }
 
   async function handleApprove(id: string) {
+    console.log(`Attempting to approve article with id: ${id}`); // 新增日誌
     try {
-      console.log(`Approving article with id: ${id}`);
       const response = await fetch(`/api/admin/articles/${id}/approve`, {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
+      console.log(
+        `Approve request sent for article ${id}. Response status:`,
+        response.status
+      ); // 新增日誌
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || "Failed to approve article");
       }
+
+      const result = await response.json();
+      console.log("Approve response:", result); // 新增日誌
+
       console.log(
         "Article approved successfully, fetching updated articles..."
       );
-      await fetchArticles(); // 重新獲取所有文章
+      await fetchArticles();
     } catch (err) {
       console.error("Error approving article:", err);
       setError(
@@ -199,7 +211,12 @@ export default function AdminPage() {
                   )}
                   {article.status === "pending" && (
                     <button
-                      onClick={() => handleApprove(article.id)}
+                      onClick={() => {
+                        console.log(
+                          `Approve button clicked for article ${article.id}`
+                        ); // 新增日誌
+                        handleApprove(article.id);
+                      }}
                       className="bg-green-500 text-white px-2 py-1 rounded"
                     >
                       通過
