@@ -9,7 +9,7 @@ export async function POST(
     await approveArticle(params.id);
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("API: Error approving article:", error);
+    console.error("Error approving article:", error);
     return NextResponse.json(
       { error: "Failed to approve article" },
       { status: 500 }

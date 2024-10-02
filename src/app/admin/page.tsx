@@ -60,7 +60,11 @@ export default function AdminPage() {
         const errorData = await response.json();
         throw new Error(errorData.error || "Failed to approve article");
       }
-      await fetchArticles(); // 重新獲取文章列表
+      setArticles(
+        articles.map((article) =>
+          article.id === id ? { ...article, status: "approved" } : article
+        )
+      );
     } catch (err) {
       console.error("Error approving article:", err);
       setError(
@@ -79,8 +83,15 @@ export default function AdminPage() {
         body: JSON.stringify({ reason }),
       });
       if (!response.ok) throw new Error("Failed to reject article");
-      await fetchArticles(); // 重新獲取文章列表
-    } catch {
+      setArticles(
+        articles.map((article) =>
+          article.id === id
+            ? { ...article, status: "rejected", rejectionReason: reason }
+            : article
+        )
+      );
+    } catch (err) {
+      console.error("Error rejecting article:", err);
       setError("Failed to reject article");
     }
   }

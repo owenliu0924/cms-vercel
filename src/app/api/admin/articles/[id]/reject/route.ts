@@ -10,7 +10,7 @@ export async function POST(
     await rejectArticle(params.id, reason);
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("API: Error rejecting article:", error);
+    console.error("Error rejecting article:", error);
     return NextResponse.json(
       { error: "Failed to reject article" },
       { status: 500 }
