@@ -1,4 +1,5 @@
 import { getArticleById } from "@/lib/db";
+import Image from "next/image";
 
 export default async function ArticlePage({
   params,
@@ -14,9 +15,17 @@ export default async function ArticlePage({
 
     return (
       <div>
-        <h1>{article.title}</h1>
+        <h1>{article.content.substring(0, 50)}...</h1>
         <p>{article.content}</p>
-        {article.imageUrl && <img src={article.imageUrl} alt="Article image" />}
+        {article.imageUrl && (
+          <Image
+            src={article.imageUrl}
+            alt="Article image"
+            width={640}
+            height={480}
+            unoptimized
+          />
+        )}
       </div>
     );
   } catch (error) {

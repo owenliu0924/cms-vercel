@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['localhost'], 
+    domains: ['y5tg9gdnxyenwazf.public.blob.vercel-storage.com'],
   },
   eslint: {
     ignoreDuringBuilds: true,
