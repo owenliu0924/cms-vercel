@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { Article } from "@/types";
 import Image from "next/image";
 import {
@@ -29,7 +29,11 @@ export default function AdminPage() {
     null
   );
 
-  const fetchArticles = useCallback(async () => {
+  useEffect(() => {
+    fetchArticles();
+  }, []);
+
+  async function fetchArticles() {
     try {
       const response = await fetch("/api/admin/articles");
       if (!response.ok) {
@@ -45,11 +49,7 @@ export default function AdminPage() {
         }`
       );
     }
-  }, []);
-
-  useEffect(() => {
-    fetchArticles();
-  }, [fetchArticles]);
+  }
 
   async function handleApprove(id: string) {
     try {
@@ -60,11 +60,7 @@ export default function AdminPage() {
         const errorData = await response.json();
         throw new Error(errorData.error || "Failed to approve article");
       }
-      setArticles(
-        articles.map((article) =>
-          article.id === id ? { ...article, status: "approved" } : article
-        )
-      );
+      await fetchArticles(); // 重新獲取所有文章
     } catch (err) {
       console.error("Error approving article:", err);
       setError(
@@ -83,13 +79,7 @@ export default function AdminPage() {
         body: JSON.stringify({ reason }),
       });
       if (!response.ok) throw new Error("Failed to reject article");
-      setArticles(
-        articles.map((article) =>
-          article.id === id
-            ? { ...article, status: "rejected", rejectionReason: reason }
-            : article
-        )
-      );
+      await fetchArticles(); // 重新獲取所有文章
     } catch (err) {
       console.error("Error rejecting article:", err);
       setError("Failed to reject article");

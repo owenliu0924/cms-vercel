@@ -6,9 +6,13 @@ export async function GET() {
     const articles = await getAllArticlesForAdmin();
     return NextResponse.json({ articles });
   } catch (error) {
-    console.error("API: Error fetching articles:", error);
+    console.error("API: Error fetching all articles for admin:", error);
     return NextResponse.json(
-      { error: "Failed to fetch articles" },
+      {
+        error: `Failed to fetch articles: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`,
+      },
       { status: 500 }
     );
   }
